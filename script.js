@@ -88,19 +88,50 @@ class SudokuGame {
         return true;
     }
 
+    // Проверяет, имеет ли головоломка уникальное решение
+    hasUniqueSolution(board) {
+        let solutions = 0;
+        let maxSolutions = 2; // Ограничиваем для производительности
+        
+        const solve = (b) => {
+            if (solutions >= maxSolutions) return; // Останавливаемся если уже нашли 2+ решения
+            
+            for (let row = 0; row < 9; row++) {
+                for (let col = 0; col < 9; col++) {
+                    if (b[row][col] === 0) {
+                        // Пробуем все возможные цифры в порядке 1-9 (не случайном!)
+                        for (let num = 1; num <= 9; num++) {
+                            if (this.isValidPlacement(b, row, col, num)) {
+                                b[row][col] = num;
+                                solve(b);
+                                b[row][col] = 0;
+                            }
+                        }
+                        return;
+                    }
+                }
+            }
+            solutions++;
+        };
+
+        solve(board);
+        return solutions === 1;
+    }
+
     // Создает головоломку из решенного судоку по уровню сложности
     createPuzzleFromSolution(solution, difficulty) {
         const puzzle = this.deepCopy(solution);
         
         // Настройки сложности: количество клеток, которые нужно заполнить
         const difficultySettings = {
-            easy: 40,    // 40 заполненных клеток (41 пустая)
-            medium: 33,  // 33 заполненных клетки (48 пустых)
-            hard: 27     // 27 заполненных клеток (54 пустых)
+            easy: { minClues: 40, maxAttempts: 30 },
+            medium: { minClues: 33, maxAttempts: 40 },
+            hard: { minClues: 27, maxAttempts: 50 }
         };
 
-        const cellsToKeep = difficultySettings[difficulty] || 33;
-        const cellsToRemove = 81 - cellsToKeep;
+        const settings = difficultySettings[difficulty] || difficultySettings.medium;
+        const minClues = settings.minClues;
+        const maxAttempts = settings.maxAttempts;
 
         // Создаем массив всех позиций
         const positions = [];
@@ -113,38 +144,72 @@ class SudokuGame {
         // Перемешиваем позиции
         this.shuffleArray(positions);
 
-        // Удаляем цифры
-        let removed = 0;
-        for (let i = 0; i < positions.length && removed < cellsToRemove; i++) {
+        let cluesRemoved = 0;
+        let maxCluesToRemove = 81 - minClues;
+
+        // Удаляем цифры по одной, проверяя уникальность решения
+        for (let i = 0; i < positions.length && cluesRemoved < maxCluesToRemove; i++) {
             const [row, col] = positions[i];
+            
+            // Не удаляем, если клетка уже пустая
+            if (puzzle[row][col] === 0) continue;
+            
             const backup = puzzle[row][col];
             puzzle[row][col] = 0;
-            removed++;
+            
+            // Проверяем, остается ли решение уникальным
+            if (this.hasUniqueSolution(this.deepCopy(puzzle))) {
+                cluesRemoved++;
+            } else {
+                // Восстанавливаем, если решение не уникально
+                puzzle[row][col] = backup;
+            }
+            
+            // Ограничиваем количество попыток для производительности
+            if (i > maxAttempts) break;
         }
 
         return puzzle;
     }
 
-    // Генерация случайного судоку
+    // Генерация случайного судоку с гарантией уникального решения
     generateSudoku(difficulty = 'medium') {
         console.log('Генерируем новое судоку...');
+        let attempts = 0;
+        const maxAttempts = 5; // Максимальное количество попыток генерации
         
-        // Генерируем решенное судоку
-        const solution = this.generateCompleteSudoku();
-        if (!solution) {
-            console.error('Не удалось сгенерировать решенное судоку');
-            return null;
-        }
+        while (attempts < maxAttempts) {
+            attempts++;
+            console.log(`Попытка генерации #${attempts}`);
+            
+            try {
+                // Генерируем решенное судоку
+                const solution = this.generateCompleteSudoku();
+                if (!solution) {
+                    console.error('Не удалось сгенерировать решенное судоку');
+                    continue;
+                }
 
-        // Создаем головоломку из решения
-        const puzzle = this.createPuzzleFromSolution(solution, difficulty);
+                // Создаем головоломку из решения
+                const puzzle = this.createPuzzleFromSolution(solution, difficulty);
+                
+                // Проверяем, что головоломка имеет уникальное решение
+                if (this.hasUniqueSolution(this.deepCopy(puzzle))) {
+                    console.log('Судоку сгенерировано успешно с уникальным решением!');
+                    return {
+                        puzzle: puzzle,
+                        solution: solution
+                    };
+                } else {
+                    console.log('Головоломка не имеет уникального решения, пробуем снова...');
+                }
+            } catch (error) {
+                console.error('Ошибка при генерации судоку:', error);
+            }
+        }
         
-        console.log('Судоку сгенерировано успешно!');
-        
-        return {
-            puzzle: puzzle,
-            solution: solution
-        };
+        console.error('Не удалось сгенерировать судоку с уникальным решением после всех попыток');
+        return null;
     }
 
     initializeGame() {
