@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Судоку</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Судоку</h1>
+        
+        <div class="game-info">
+            <div class="timer">⏱️ Время: <span id="timer">00:00</span></div>
+            <div class="moves">🔢 Ходы: <span id="moves">0</span></div>
+        </div>
+
+        <div id="sudoku-grid" class="sudoku-grid"></div>
+        
+        <!-- Цифровая панель -->
+        <div id="number-pad" class="number-pad">
+            <button class="number-btn" data-number="1">1</button>
+            <button class="number-btn" data-number="2">2</button>
+            <button class="number-btn" data-number="3">3</button>
+            <button class="number-btn" data-number="4">4</button>
+            <button class="number-btn" data-number="5">5</button>
+            <button class="number-btn" data-number="6">6</button>
+            <button class="number-btn" data-number="7">7</button>
+            <button class="number-btn" data-number="8">8</button>
+            <button class="number-btn" data-number="9">9</button>
+            <button class="number-btn delete-btn" data-action="delete">⌫</button>
+        </div>
+
+        <div class="controls">
+            <button id="new-game" class="btn">🆕 Новая игра</button>
+            <button id="check" class="btn">✅ Проверить</button>
+            <button id="solve" class="btn">💡 Решить</button>
+        </div>
+
+        <div id="message" class="message"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
