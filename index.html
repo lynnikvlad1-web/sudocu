@@ -8,21 +8,26 @@
 </head>
 <body>
     <div class="container">
-        <h1>🎮 Судоку</h1>
-        
-        <div class="game-info">
-            <div class="timer">⏱️ Время: <span id="timer">00:00</span></div>
-            <div class="moves">🔢 Ходы: <span id="moves">0</span></div>
-        </div>
+        <!-- Панель управления -->
+        <div class="control-panel">
+            <div class="game-info">
+                <div class="timer">⏱️ <span id="timer">00:00</span></div>
+                <div class="moves">🔢 <span id="moves">0</span></div>
+            </div>
 
-        <!-- Выбор сложности -->
-        <div class="difficulty-selector">
-            <label for="difficulty">Сложность:</label>
-            <select id="difficulty">
-                <option value="easy">Легко</option>
-                <option value="medium" selected>Средне</option>
-                <option value="hard">Сложно</option>
-            </select>
+            <div class="difficulty-selector">
+                <label for="difficulty">Сложность:</label>
+                <select id="difficulty">
+                    <option value="easy">Легко</option>
+                    <option value="medium" selected>Средне</option>
+                    <option value="hard">Сложно</option>
+                </select>
+            </div>
+
+            <div class="top-controls">
+                <button id="stats-btn" class="control-btn">📊 Статистика</button>
+                <button id="new-game" class="control-btn">🔄 Новая игра</button>
+            </div>
         </div>
 
         <div id="sudoku-grid" class="sudoku-grid"></div>
@@ -42,7 +47,6 @@
         </div>
 
         <div class="controls">
-            <button id="new-game" class="btn">🆕 Новая игра</button>
             <button id="check" class="btn">✅ Проверить</button>
             <button id="solve" class="btn">💡 Решить</button>
         </div>
@@ -50,6 +54,7 @@
         <div id="message" class="message"></div>
     </div>
 
+    <script src="stats.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
