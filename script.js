@@ -9,6 +9,7 @@ class SudokuGame {
         this.timerInterval = null;
         this.isGameActive = false;
         this.currentDifficulty = 'medium';
+        this.stats = new SudokuStats(); // Инициализируем статистику
         
         if (!this.loadProgress()) {
             this.initializeGame();
@@ -433,6 +434,7 @@ class SudokuGame {
         document.getElementById('new-game').addEventListener('click', () => this.startNewGame());
         document.getElementById('check').addEventListener('click', () => this.checkSolution());
         document.getElementById('solve').addEventListener('click', () => this.solvePuzzle());
+        document.getElementById('stats-btn').addEventListener('click', () => this.stats.showStats());
 
         const numberButtons = document.querySelectorAll('.number-btn[data-number]');
         numberButtons.forEach(button => {
@@ -580,6 +582,12 @@ class SudokuGame {
         this.isGameActive = false;
         if (this.timerInterval) {
             clearInterval(this.timerInterval);
+        }
+
+        // Сохраняем статистику, если игрок выиграл
+        if (isWin) {
+            const gameTime = Math.floor((Date.now() - this.startTime) / 1000);
+            this.stats.addRecord(this.currentDifficulty, gameTime, this.moves);
         }
 
         this.clearProgress();
